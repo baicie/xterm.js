@@ -4,6 +4,71 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Dev: Rolldown Watch + Server",
+      "cwd": "${workspaceRoot}",
+      "console": "integratedTerminal",
+      "tasks": [
+        {
+          "label": "rolldown-watch",
+          "type": "shell",
+          "command": "node bin/rolldown_build.mjs --watch",
+          "isBackground": true,
+          "problemMatcher": []
+        }
+      ],
+      "problemMatcher": [],
+      "runOptions": {
+        "instanceLimit": 1
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Dev: Debug Server (Node Inspector)",
+      "cwd": "${workspaceRoot}",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "--inspect=9229",
+        "--loader", "ts-node/esm",
+        "demo/server/server.ts"
+      ],
+      "env": {
+        "FORCE_COLOR": "0"
+      },
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "App listening to (http://.*?:[0-9]+)"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Dev: Rolldown Build (once)",
+      "cwd": "${workspaceRoot}",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "bin/rolldown_build.mjs"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "type": "pwa-chrome",
+      "request": "launch",
+      "name": "Dev: Chrome Debug (source maps)",
+      "url": "http://127.0.0.1:3000",
+      "webRoot": "${workspaceFolder}/",
+      "sourceMaps": true
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug: Attach to Node (9229)",
+      "cwd": "${workspaceRoot}",
+      "port": 9229
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Unit Tests",
       "cwd": "${workspaceRoot}",
       "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/mocha",
@@ -13,13 +78,13 @@
       "runtimeArgs": [
         "--colors",
         "--recursive",
-        "${workspaceRoot}/out/**/*.test.js"
+        "${workspaceRoot}/out-esbuild-test/**/*.test.js"
       ],
       "env": {
-        "NODE_PATH": "${workspaceRoot}/out"
+        "NODE_PATH": "${workspaceRoot}/out-esbuild"
       },
       "sourceMaps": true,
-      "outFiles": [ "${workspaceRoot}/out/**/*.js" ],
+      "outFiles": [ "${workspaceRoot}/out-esbuild/**/*.js" ],
       "internalConsoleOptions": "openOnSessionStart"
     },
     {
@@ -34,10 +99,10 @@
       "runtimeArgs": [
         "--colors",
         "--recursive",
-        "${workspaceRoot}/out/**/*.api.js"
+        "${workspaceRoot}/out-esbuild-test/**/*api.js"
       ],
       "sourceMaps": true,
-      "outFiles": [ "${workspaceRoot}/lib/**/*.js" ],
+      "outFiles": [ "${workspaceRoot}/out-esbuild/**/*.js" ],
       "internalConsoleOptions": "openOnSessionStart"
     },
     {

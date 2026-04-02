@@ -173,6 +173,43 @@ describe('Terminal', () => {
       assert.equal(term.keyDown(evKeyDown), false);
       assert.equal(term.keyPress(evKeyPress), false);
     });
+
+    it('should allow multiple rapid key presses to all be processed', () => {
+      // This tests a fix for Apple WebKit where only the first character
+      // was processed when multiple keys were pressed simultaneously.
+      // The _keyPressHandled flag needs to be reset for each new keydown.
+      let keyCount = 0;
+      term.onKey(() => keyCount++);
+
+      const evA = {
+        preventDefault: () => { },
+        stopPropagation: () => { },
+        type: 'keydown',
+        key: 'a',
+        keyCode: 65,
+        ctrlKey: false,
+        altKey: false,
+        metaKey: false
+      } as KeyboardEvent;
+      const evB = {
+        preventDefault: () => { },
+        stopPropagation: () => { },
+        type: 'keydown',
+        key: 'b',
+        keyCode: 66,
+        ctrlKey: false,
+        altKey: false,
+        metaKey: false
+      } as KeyboardEvent;
+
+      // First keydown should be processed
+      term.keyDown(evA);
+      assert.equal(keyCount, 1, 'First keydown should fire key event');
+
+      // Second keydown should also be processed (fix for Apple WebKit)
+      term.keyDown(evB);
+      assert.equal(keyCount, 2, 'Second keydown should also fire key event');
+    });
   });
 
   describe('clear', () => {

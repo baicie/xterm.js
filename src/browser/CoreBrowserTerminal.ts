@@ -843,6 +843,11 @@ export class CoreBrowserTerminal extends CoreTerminal implements ITerminal {
   protected _keyDown(event: KeyboardEvent): boolean | undefined {
     this._keyDownHandled = false;
     this._keyDownSeen = true;
+    // Reset _keyPressHandled at the start of each keydown to ensure that multiple
+    // rapidly pressed keys all get processed. This fixes an issue in Apple WebKit
+    // where only the first character was processed when multiple keys were pressed
+    // simultaneously.
+    this._keyPressHandled = false;
 
     if (this._customKeyEventHandler && this._customKeyEventHandler(event) === false) {
       return false;
@@ -917,6 +922,19 @@ export class CoreBrowserTerminal extends CoreTerminal implements ITerminal {
     this._onKey.fire({ key: result.key, domEvent: event });
     this._showCursor();
     this.coreService.triggerDataEvent(result.key, !wasModifierOnly);
+
+    // On Safari (Apple WebKit), we should NOT call preventDefault() for regular character keys
+    // because Safari doesn't fire keypress events. Without preventDefault(), the character will
+    // be inserted into the textarea and trigger an input event, which will send the data.
+    // For other browsers, we cancel the event to prevent double processing.
+    // Special keys (ctrl, alt) always prevent default.
+    const isSafari = /^((?!chrome|android).)*safari/i.test(this.browser.userAgent);
+    if (!this.optionsService.rawOptions.screenReaderMode && isSafari) {
+      // Safari: allow the event to propagate so input event fires
+      // Still update _keyDownHandled for consistency
+      this._keyDownHandled = true;
+      return true;
+    }
 
     // Cancel events when not in screen reader mode so events don't get bubbled up and handled by
     // other listeners. When screen reader mode is enabled, we don't cancel them (unless ctrl or alt
@@ -1027,8 +1045,10 @@ export class CoreBrowserTerminal extends CoreTerminal implements ITerminal {
     // Only support emoji IMEs when screen reader mode is disabled as the event must bubble up to
     // support reading out character input which can doubling up input characters
     // Based on these event traces: https://github.com/xtermjs/xterm.js/issues/3679
-    if (ev.data && ev.inputType === 'insertText' && (!ev.composed || !this._keyDownSeen) && !this.optionsService.rawOptions.screenReaderMode) {
-      if (this._keyPressHandled) {
+    if (ev.data && ev.inputType === 'insertText' && !this.optionsService.rawOptions.screenReaderMode) {
+      // For non-composed text, we should always process it
+      // For composed text, only process if keydown wasn't seen (to avoid double processing)
+      if (ev.composed && this._keyDownSeen) {
         return false;
       }
 

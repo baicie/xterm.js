@@ -13,7 +13,7 @@ Makefile.gyp
 *.target.gyp.mk
 *.node
 example/*.log
-docs/
+# docs/
 npm-debug.log
 /.idea/
 .env
