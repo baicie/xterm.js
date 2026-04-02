@@ -1,7 +1,7 @@
 import * as opentype from 'opentype.js';
 import LRUCache = require('lru-cache');
 
-import { IFont, ILigatureData, IFlattenedLookupTree, ILookupTree, IOptions } from './types';
+import type { IFont, ILigatureData, IFlattenedLookupTree, ILookupTree, IOptions } from './types';
 import mergeTrees from './merge';
 import walkTree from './walk';
 import mergeRange from './mergeRange';

@@ -47,11 +47,13 @@ const bundleConfig = defineConfig({
     file: `addons/addon-${addon}/lib/addon-${addon}.mjs`,
     format: 'esm',
     banner,
+    minify: isProd,
+    sourcemap: true,
   },
   treeshake: true,
-  minify: isProd,
-  sourcemap: true,
-  target: 'es2021',
+  transform:{
+    target:'es2021'
+  },
   platform: addon === 'ligatures' ? 'node' : 'browser',
 });
 
@@ -63,11 +65,13 @@ const outConfig = defineConfig({
     format: 'cjs',
     entryFileNames: '[name].js',
     preserveModules: false,
+    minify: isProd,
+    sourcemap: !isProd,
   },
   treeshake: true,
-  minify: isProd,
-  sourcemap: true,
-  target: 'es2021',
+  transform:{
+    target:'es2021'
+  },
 });
 
 // Test output
@@ -80,11 +84,14 @@ const testConfig = addon === 'ligatures'
         format: 'cjs',
         entryFileNames: '[name].js',
         preserveModules: false,
+        minify: isProd,
+        sourcemap: true,
+
       },
       treeshake: true,
-      minify: isProd,
-      sourcemap: true,
-      target: 'es2021',
+      transform:{
+        target:'es2021'
+      },
     });
 
 export default defineConfig(
