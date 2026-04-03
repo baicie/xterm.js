@@ -843,11 +843,6 @@ export class CoreBrowserTerminal extends CoreTerminal implements ITerminal {
   protected _keyDown(event: KeyboardEvent): boolean | undefined {
     this._keyDownHandled = false;
     this._keyDownSeen = true;
-    // Reset _keyPressHandled at the start of each keydown to ensure that multiple
-    // rapidly pressed keys all get processed. This fixes an issue in Apple WebKit
-    // where only the first character was processed when multiple keys were pressed
-    // simultaneously.
-    this._keyPressHandled = false;
 
     if (this._customKeyEventHandler && this._customKeyEventHandler(event) === false) {
       return false;
