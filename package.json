@@ -1,12 +1,12 @@
 {
-  "name": "@xterm/xterm",
+  "name": "@baicie/xterm",
   "description": "Full xterm terminal, in your browser",
-  "version": "6.0.0",
+  "version": "0.1.0",
   "main": "lib/xterm.js",
   "module": "lib/xterm.mjs",
   "style": "css/xterm.css",
   "types": "typings/xterm.d.ts",
-  "repository": "https://github.com/xtermjs/xterm.js",
+  "repository": "https://github.com/your-username/xterm.js",
   "license": "MIT",
   "workspaces": [
     "addons/*"
@@ -81,9 +81,12 @@
     "prepackage-headless": "npm run rolldown-package-headless-only",
     "package-headless": "node bin/rolldown_build.mjs --prod --headless",
     "prepublishOnly": "npm run package",
-    "agent:setup-repo": "node bin/agent/setup-repo.mjs"
+    "agent:setup-repo": "node bin/agent/setup-repo.mjs",
+    "release": "node bin/release.mjs",
+    "ci-release": "node bin/release.mjs --dry"
   },
   "devDependencies": {
+    "@baicie/release": "^0.1.12",
     "@lunapaint/png-codec": "^0.2.0",
     "@playwright/test": "^1.59.1",
     "@stylistic/eslint-plugin": "^5.10.0",
