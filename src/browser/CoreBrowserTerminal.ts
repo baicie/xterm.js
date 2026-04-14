@@ -895,7 +895,9 @@ export class CoreBrowserTerminal extends CoreTerminal implements ITerminal {
     // HACK: Process A-Z in the keypress event to fix an issue with macOS IMEs where lower case
     // letters cannot be input while caps lock is on. Skip this hack when using kitty protocol
     // or Win32 input mode as they need to send proper sequences for all key events.
-    if (!this._keyboardService.useKitty && !this._keyboardService.useWin32InputMode && event.key && !event.ctrlKey && !event.altKey && !event.metaKey && event.key.length === 1) {
+    // NOTE: Skip this HACK on Safari because Safari doesn't fire keypress events.
+    const isSafari = /^((?!chrome|android).)*safari/i.test(this.browser.userAgent);
+    if (!isSafari && !this._keyboardService.useKitty && !this._keyboardService.useWin32InputMode && event.key && !event.ctrlKey && !event.altKey && !event.metaKey && event.key.length === 1) {
       if (event.key.charCodeAt(0) >= 65 && event.key.charCodeAt(0) <= 90) {
         return true;
       }
@@ -918,15 +920,11 @@ export class CoreBrowserTerminal extends CoreTerminal implements ITerminal {
     this._showCursor();
     this.coreService.triggerDataEvent(result.key, !wasModifierOnly);
 
-    // On Safari (Apple WebKit), we should NOT call preventDefault() for regular character keys
-    // because Safari doesn't fire keypress events. Without preventDefault(), the character will
-    // be inserted into the textarea and trigger an input event, which will send the data.
-    // For other browsers, we cancel the event to prevent double processing.
-    // Special keys (ctrl, alt) always prevent default.
-    const isSafari = /^((?!chrome|android).)*safari/i.test(this.browser.userAgent);
+    // On Safari (Apple WebKit), allow default behavior because:
+    // 1. Safari fires input events BEFORE keydown events for character input
+    // 2. The _inputEvent handler now processes all input data on Safari
+    // 3. We should NOT preventDefault() on Safari keydown to let input events through
     if (!this.optionsService.rawOptions.screenReaderMode && isSafari) {
-      // Safari: allow the event to propagate so input event fires
-      // Still update _keyDownHandled for consistency
       this._keyDownHandled = true;
       return true;
     }
@@ -1041,6 +1039,16 @@ export class CoreBrowserTerminal extends CoreTerminal implements ITerminal {
     // support reading out character input which can doubling up input characters
     // Based on these event traces: https://github.com/xtermjs/xterm.js/issues/3679
     if (ev.data && ev.inputType === 'insertText' && !this.optionsService.rawOptions.screenReaderMode) {
+      // Safari fires input events BEFORE keydown events for character input
+      // So for Safari, we should always process input events without checking _keyDownSeen
+      // Other browsers: _keyDown has already processed the data, input events should be skipped
+      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+      if (isSafari) {
+        this._unprocessedDeadKey = false;
+        this.coreService.triggerDataEvent(ev.data, true);
+        return true;
+      }
+
       // For non-composed text, we should always process it
       // For composed text, only process if keydown wasn't seen (to avoid double processing)
       if (ev.composed && this._keyDownSeen) {
@@ -1051,8 +1059,7 @@ export class CoreBrowserTerminal extends CoreTerminal implements ITerminal {
       // keys could be ignored
       this._unprocessedDeadKey = false;
 
-      const text = ev.data;
-      this.coreService.triggerDataEvent(text, true);
+      this.coreService.triggerDataEvent(ev.data, true);
       return true;
     }
 
