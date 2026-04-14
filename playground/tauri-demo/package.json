@@ -15,7 +15,13 @@
     "@baicie/xterm": "workspace:*",
     "@xterm/addon-fit": "workspace:*",
     "@xterm/addon-search": "workspace:*",
-    "@xterm/addon-webgl": "workspace:*"
+    "@xterm/addon-webgl": "workspace:*",
+    "@xterm/addon-unicode11": "workspace:*",
+    "@xterm/addon-web-links": "workspace:*",
+    "@xterm/addon-web-fonts": "workspace:*",
+    "@xterm/addon-unicode-graphemes": "workspace:*",
+    "@xterm/addon-ligatures": "workspace:*",
+    "@xterm/addon-clipboard": "workspace:*"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.5.0",

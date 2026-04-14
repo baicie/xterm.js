@@ -270,12 +270,30 @@ importers:
       '@baicie/xterm':
         specifier: workspace:*
         version: link:../..
+      '@xterm/addon-clipboard':
+        specifier: workspace:*
+        version: link:../../addons/addon-clipboard
       '@xterm/addon-fit':
         specifier: workspace:*
         version: link:../../addons/addon-fit
+      '@xterm/addon-ligatures':
+        specifier: workspace:*
+        version: link:../../addons/addon-ligatures
       '@xterm/addon-search':
         specifier: workspace:*
         version: link:../../addons/addon-search
+      '@xterm/addon-unicode-graphemes':
+        specifier: workspace:*
+        version: link:../../addons/addon-unicode-graphemes
+      '@xterm/addon-unicode11':
+        specifier: workspace:*
+        version: link:../../addons/addon-unicode11
+      '@xterm/addon-web-fonts':
+        specifier: workspace:*
+        version: link:../../addons/addon-web-fonts
+      '@xterm/addon-web-links':
+        specifier: workspace:*
+        version: link:../../addons/addon-web-links
       '@xterm/addon-webgl':
         specifier: workspace:*
         version: link:../../addons/addon-webgl

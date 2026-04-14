@@ -1,5 +1,3 @@
 {
-  "build": {
-    "devtools": true
-  }
+  "build": {}
 }

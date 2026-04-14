@@ -841,6 +841,7 @@ export class CoreBrowserTerminal extends CoreTerminal implements ITerminal {
    * [KeyboardEvent]: https://developer.mozilla.org/en-US/docs/DOM/KeyboardEvent
    */
   protected _keyDown(event: KeyboardEvent): boolean | undefined {
+    console.debug('[WebKit] _keyDown called, userAgent:', navigator.userAgent, 'isWebKitBased:', Browser.isWebKitBased, 'key:', event.key);
     this._keyDownHandled = false;
     this._keyDownSeen = true;
 
@@ -898,6 +899,7 @@ export class CoreBrowserTerminal extends CoreTerminal implements ITerminal {
     // NOTE: Skip this HACK on WebKit-based browsers (Safari, WebView) because they don't fire keypress events.
     if (!Browser.isWebKitBased && !this._keyboardService.useKitty && !this._keyboardService.useWin32InputMode && event.key && !event.ctrlKey && !event.altKey && !event.metaKey && event.key.length === 1) {
       if (event.key.charCodeAt(0) >= 65 && event.key.charCodeAt(0) <= 90) {
+        console.debug('[WebKit] A-Z HACK skipped for non-WebKit, key:', event.key);
         return true;
       }
     }
@@ -917,6 +919,7 @@ export class CoreBrowserTerminal extends CoreTerminal implements ITerminal {
     const wasModifierOnly = this._keyboardService.useWin32InputMode && wasModifierKeyOnlyEvent(event);
     this._onKey.fire({ key: result.key, domEvent: event });
     this._showCursor();
+    console.debug('[Input] _keyDown triggerDataEvent, key:', result.key, 'wasModifierOnly:', wasModifierOnly, 'isWebKitBased:', Browser.isWebKitBased);
     this.coreService.triggerDataEvent(result.key, !wasModifierOnly);
 
     // On WebKit-based browsers (Safari, macOS WebView), allow default behavior because:
@@ -924,6 +927,7 @@ export class CoreBrowserTerminal extends CoreTerminal implements ITerminal {
     // 2. The _inputEvent handler now processes all input data on WebKit browsers
     // 3. We should NOT preventDefault() on WebKit keydown to let input events through
     if (!this.optionsService.rawOptions.screenReaderMode && Browser.isWebKitBased) {
+      console.debug('[WebKit] keydown allow default, key:', event.key);
       this._keyDownHandled = true;
       return true;
     }
@@ -970,6 +974,7 @@ export class CoreBrowserTerminal extends CoreTerminal implements ITerminal {
     const result = this._keyboardService.evaluateKeyUp(ev);
     if (result?.key) {
       const wasModifierOnly = this._keyboardService.useWin32InputMode && wasModifierKeyOnlyEvent(ev);
+      console.debug('[Input] _keyUp triggerDataEvent, key:', result.key, 'wasModifierOnly:', wasModifierOnly);
       this.coreService.triggerDataEvent(result.key, !wasModifierOnly);
     }
 
@@ -1016,6 +1021,7 @@ export class CoreBrowserTerminal extends CoreTerminal implements ITerminal {
 
     this._onKey.fire({ key, domEvent: ev });
     this._showCursor();
+    console.debug('[Input] _keyPress triggerDataEvent, key:', key, 'isWebKitBased:', Browser.isWebKitBased, '_keyDownHandled:', this._keyDownHandled);
     this.coreService.triggerDataEvent(key, true);
 
     this._keyPressHandled = true;
@@ -1034,6 +1040,7 @@ export class CoreBrowserTerminal extends CoreTerminal implements ITerminal {
    * @param ev The input event to be handled.
    */
   protected _inputEvent(ev: InputEvent): boolean {
+    console.debug('[WebKit] _inputEvent called, userAgent:', navigator.userAgent, 'isWebKitBased:', Browser.isWebKitBased, 'data:', ev.data, 'inputType:', ev.inputType);
     // Only support emoji IMEs when screen reader mode is disabled as the event must bubble up to
     // support reading out character input which can doubling up input characters
     // Based on these event traces: https://github.com/xtermjs/xterm.js/issues/3679
@@ -1042,6 +1049,7 @@ export class CoreBrowserTerminal extends CoreTerminal implements ITerminal {
       // So for WebKit browsers, we should always process input events without checking _keyDownSeen
       // Other browsers: _keyDown has already processed the data, input events should be skipped
       if (Browser.isWebKitBased) {
+        console.debug('[WebKit] _inputEvent processing WebKit input:', ev.data, '_keyDownSeen:', this._keyDownSeen);
         this._unprocessedDeadKey = false;
         this.coreService.triggerDataEvent(ev.data, true);
         return true;
@@ -1050,6 +1058,7 @@ export class CoreBrowserTerminal extends CoreTerminal implements ITerminal {
       // For non-composed text, we should always process it
       // For composed text, only process if keydown wasn't seen (to avoid double processing)
       if (ev.composed && this._keyDownSeen) {
+        console.debug('[Input] _inputEvent skip (composed + keyDown seen), data:', ev.data, 'composed:', ev.composed, '_keyDownSeen:', this._keyDownSeen);
         return false;
       }
 
@@ -1057,10 +1066,12 @@ export class CoreBrowserTerminal extends CoreTerminal implements ITerminal {
       // keys could be ignored
       this._unprocessedDeadKey = false;
 
+      console.debug('[Input] _inputEvent non-WebKit triggerDataEvent, data:', ev.data, 'composed:', ev.composed, '_keyDownSeen:', this._keyDownSeen);
       this.coreService.triggerDataEvent(ev.data, true);
       return true;
     }
 
+    console.debug('[Input] _inputEvent returning false, data:', ev.data, 'inputType:', ev.inputType, 'screenReaderMode:', this.optionsService.rawOptions.screenReaderMode);
     return false;
   }
 

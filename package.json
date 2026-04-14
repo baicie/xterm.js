@@ -1,7 +1,7 @@
 {
   "name": "@baicie/xterm",
   "description": "Full xterm terminal, in your browser",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "main": "lib/xterm.js",
   "module": "lib/xterm.mjs",
   "style": "css/xterm.css",
