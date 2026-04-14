@@ -1,7 +1,7 @@
 {
   "name": "@baicie/xterm",
   "description": "Full xterm terminal, in your browser",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "main": "lib/xterm.js",
   "module": "lib/xterm.mjs",
   "style": "css/xterm.css",
@@ -80,7 +80,7 @@
     "postpackage": "npm run rolldown-package",
     "prepackage-headless": "npm run rolldown-package-headless-only",
     "package-headless": "node bin/rolldown_build.mjs --prod --headless",
-    "prepublishOnly": "npm run package",
+    "prepublishOnly": "pnpm run rolldown",
     "agent:setup-repo": "node bin/agent/setup-repo.mjs",
     "release": "node bin/release.mjs",
     "ci-publish": "node bin/publish.mjs"
