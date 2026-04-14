@@ -1,7 +1,7 @@
 {
   "name": "@baicie/xterm",
   "description": "Full xterm terminal, in your browser",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "lib/xterm.js",
   "module": "lib/xterm.mjs",
   "style": "css/xterm.css",
@@ -83,7 +83,7 @@
     "prepublishOnly": "npm run package",
     "agent:setup-repo": "node bin/agent/setup-repo.mjs",
     "release": "node bin/release.mjs",
-    "ci-release": "node bin/release.mjs --dry"
+    "ci-publish": "node bin/publish.mjs"
   },
   "devDependencies": {
     "@baicie/release": "^0.1.12",

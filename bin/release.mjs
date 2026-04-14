@@ -1,11 +1,3 @@
-/**
- * Release script for @baicie/xterm
- * Usage: node bin/release.mjs [options]
- *
- * Options:
- *   --dry         Dry run mode (no actual changes)
- */
-
 import { release } from '@baicie/release'
 import { resolve } from 'node:path'
 
